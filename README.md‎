@@ -1,0 +1,86 @@
+# Meli Checkout API — base da Aula 2
+
+Projeto Spring Boot 3 a ser evoluído ao longo da Aula 2 do PE-JV-003. O domínio já chega no estado-alvo da Aula 1 (records, sealed interface, composição de regras); o que falta é toda a borda HTTP.
+
+## Como rodar
+
+```bash
+mvn -q spring-boot:run
+```
+
+Endpoints disponíveis no estado inicial:
+
+```bash
+curl -i http://localhost:8080/carrinho/c-1
+curl -i -X POST http://localhost:8080/carrinho/c-1/cupom \
+     -H 'Content-Type: application/json' -d '{"codigo":"MELI10"}'
+```
+
+## Estado inicial — problemas plantados
+
+| # | Sintoma | Bloco da aula | Local |
+| --- | --- | --- | --- |
+| 1 | `Map<String,Object>` em vez de DTO record + `@Valid` | Bloco 1 | `CarrinhoController.aplicarCupom` |
+| 2 | Carrinho inexistente vira 500 (NPE) | Bloco 2 | `CarrinhoController.buscar`, sem `GlobalExceptionHandler` |
+| 3 | Cupom inválido vira 500 (RuntimeException sem handler) | Bloco 2 | sem `GlobalExceptionHandler` |
+| 4 | Sem ProblemDetail / Content-Type `application/problem+json` | Bloco 2 | sem `GlobalExceptionHandler` |
+| 5 | Retry de cliente reaplica chamada | Bloco 3 | sem `IdempotencyKeyFilter` |
+| 6 | Sem documentação OpenAPI | Bloco 4 | dependência springdoc comentada no pom |
+| 7 | Falha do serviço de fraude derruba o checkout | Bloco 5 | dependência resilience4j comentada no pom |
+
+## Estrutura
+
+```
+src/main/java/com/meli/checkout
+├── MeliCheckoutApplication.java
+├── api/
+│   └── CarrinhoController.java              <- alvo da refatoração
+├── application/
+│   ├── AplicarCupomUseCase.java
+│   └── exceptions/
+│       ├── CarrinhoNaoEncontrado.java
+│       ├── CupomNaoEncontrado.java
+│       └── CupomInvalido.java
+├── config/
+│   └── ClockConfig.java
+├── domain/                                  <- resultado da Aula 1
+│   ├── Carrinho.java
+│   ├── Cupom.java
+│   ├── CupomService.java
+│   ├── ItemCarrinho.java
+│   └── MotivoFalhaCupom.java
+└── infrastructure/
+    ├── CarrinhoRepository.java
+    └── CupomRepository.java
+```
+
+A pasta `SOLUCAO/` traz **trechos alvo** de cada bloco (DTO request, `GlobalExceptionHandler` com ProblemDetail, `IdempotencyKeyFilter`, etc.). **Não mostrar para a turma antes de cada bloco.**
+
+## Testes
+
+`src/test/java/com/meli/checkout/api/CarrinhoControllerTest.java` tem o caminho feliz já passando. Os outros testes estão `@Disabled` com uma label indicando qual bloco da aula vai habilitá-los — use isso como termômetro visível do progresso.
+
+```bash
+mvn -q test
+```
+
+## Fixtures
+
+| Carrinho | Cliente | Itens | Valor bruto | Categorias |
+| --- | --- | --- | --- | --- |
+| c-1 | cliente-alice | 2 (eletrônicos + casa) | R$ 250 | eletronicos, casa |
+| c-2 | cliente-bob | 1 (moda) | R$ 80 | moda |
+
+| Cupom | Validade | Mín. | Desconto | Categorias |
+| --- | --- | --- | --- | --- |
+| MELI10 | 31/12/2026 | R$ 100 | R$ 25 | eletronicos, casa |
+| EXPIRADO | 01/01/2025 | R$ 50 | R$ 10 | eletronicos, casa, moda |
+| MODA15 | 31/12/2026 | R$ 50 | R$ 15 | moda |
+
+Cenários reproduzíveis ao vivo:
+
+- `c-1` + `MELI10` → 200 OK, valorFinal = 225
+- `c-1` + `EXPIRADO` → 422 (Expirado) após Bloco 2
+- `c-1` + `MODA15` → 422 (CategoriaInvalida) após Bloco 2
+- `c-2` + `MELI10` → 422 (ValorMinimo + CategoriaInvalida) após Bloco 2
+- `c-inexistente` + qualquer → 404 após Bloco 2
