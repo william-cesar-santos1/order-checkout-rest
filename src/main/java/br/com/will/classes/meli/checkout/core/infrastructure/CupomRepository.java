@@ -1,5 +1,6 @@
 package br.com.will.classes.meli.checkout.core.infrastructure;
 
+import br.com.will.classes.meli.checkout.core.application.ports.CupomRepositoryPort;
 import br.com.will.classes.meli.checkout.core.domain.Cupom;
 import org.springframework.stereotype.Repository;
 
@@ -11,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
-public class CupomRepository {
+public class CupomRepository implements CupomRepositoryPort {
 
     private final Map<String, Cupom> store = new ConcurrentHashMap<>();
 

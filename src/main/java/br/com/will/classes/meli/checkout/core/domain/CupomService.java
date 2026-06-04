@@ -4,6 +4,7 @@ import br.com.will.classes.meli.checkout.core.domain.regras.RegraCategoria;
 import br.com.will.classes.meli.checkout.core.domain.regras.RegraDeCupom;
 import br.com.will.classes.meli.checkout.core.domain.regras.RegraValidade;
 import br.com.will.classes.meli.checkout.core.domain.regras.RegraValorMinimo;
+
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
