@@ -33,8 +33,8 @@ checkout:
   fraude:
     simular-falhas: false
 
-# springdoc:
-#   swagger-ui:
-#     path: /swagger-ui.html
-#   api-docs:
-#     path: /v3/api-docs
+springdoc:
+ swagger-ui:
+   path: /swagger-ui.html
+ api-docs:
+   path: /v3/api-docs
