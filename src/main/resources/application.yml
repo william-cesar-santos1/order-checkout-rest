@@ -29,8 +29,8 @@ resilience4j:
         permittedNumberOfCallsInHalfOpenState: 3
         minimumNumberOfCalls: 5
 
-# springdoc:
-#   swagger-ui:
-#     path: /swagger-ui.html
-#   api-docs:
-#     path: /v3/api-docs
+springdoc:
+ swagger-ui:
+   path: /swagger-ui.html
+ api-docs:
+   path: /v3/api-docs

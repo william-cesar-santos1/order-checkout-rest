@@ -34,14 +34,11 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
-        <!-- Bloco 4: descomente para habilitar Swagger UI -->
-        <!--
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <version>${springdoc.version}</version>
         </dependency>
-        -->
 
         <!-- Bloco 5: Circuit Breaker -->
         <dependency>
