@@ -1,5 +1,6 @@
 package br.com.will.classes.meli.checkout.core.api;
 
+import br.com.will.classes.meli.checkout.core.application.exceptions.ServicoIndisponivel;
 import br.com.will.classes.meli.checkout.core.application.exceptions.CarrinhoNaoEncontrado;
 import br.com.will.classes.meli.checkout.core.application.exceptions.CupomInvalido;
 import br.com.will.classes.meli.checkout.core.application.exceptions.CupomNaoEncontrado;
@@ -23,6 +24,15 @@ import java.util.Set;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ServicoIndisponivel.class)
+    public ProblemDetail handleServicoIndisponivel(ServicoIndisponivel ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        pd.setTitle("Serviço indisponível");
+        pd.setType(URI.create("https://meli.local/erros/servico-indisponivel"));
+        pd.setProperty("timestamp", Instant.now().toString());
+        return pd;
+    }
 
     @ExceptionHandler(CarrinhoNaoEncontrado.class)
     public ProblemDetail handleCarrinhoNaoEncontrado(CarrinhoNaoEncontrado ex) {

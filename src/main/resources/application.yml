@@ -16,22 +16,18 @@ management:
     health:
       show-details: when-authorized
 
-# resilience4j:
-#   circuitbreaker:
-#     instances:
-#       fraudeService:
-#         registerHealthIndicator: true
-#         slidingWindowSize: 10
-#         failureRateThreshold: 50
-#         slowCallRateThreshold: 60
-#         slowCallDurationThreshold: 2s
-#         waitDurationInOpenState: 30s
-#         permittedNumberOfCallsInHalfOpenState: 3
-#         minimumNumberOfCalls: 5
-
-checkout:
-  fraude:
-    simular-falhas: false
+resilience4j:
+  circuitbreaker:
+    instances:
+      fraudeService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        slowCallRateThreshold: 60
+        slowCallDurationThreshold: 2s
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
+        minimumNumberOfCalls: 5
 
 # springdoc:
 #   swagger-ui:
